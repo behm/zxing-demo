@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
-using System.Reflection.Emit;
 using ZXing;
 using ZXing.Common;
 using ZXing.QrCode;
@@ -20,7 +18,6 @@ namespace ZXingDemo
             Console.WriteLine($"Barcode was written to: \n'{filePath}'");
 
             var content = ReadBarcode(filePath);
-
             Console.WriteLine($"\nBarcode contents: {content}");
         }
 
