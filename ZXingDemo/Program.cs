@@ -1,6 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
+using System.Reflection.Emit;
 using ZXing;
 using ZXing.Common;
 using ZXing.QrCode;
@@ -13,6 +16,16 @@ namespace ZXingDemo
         {
             Console.WriteLine("ZXing Demo!");
 
+            var filePath = WriteBarcode("https://omnitech-inc.com/");
+            Console.WriteLine($"Barcode was written to: \n'{filePath}'");
+
+            var content = ReadBarcode(filePath);
+
+            Console.WriteLine($"\nBarcode contents: {content}");
+        }
+
+        static string WriteBarcode(string content)
+        {
             var writer = new BarcodeWriter
             {
                 Format = BarcodeFormat.QR_CODE,
@@ -31,13 +44,36 @@ namespace ZXingDemo
             {
                 Directory.CreateDirectory(outputFolder);
             }
-            
+
             var fileName = $"BarCode_{DateTime.Now:yyyyMMdd_HHmmss}_{Guid.NewGuid()}.png";
             var filePath = Path.Combine(outputFolder, fileName);
-            Console.WriteLine($"Writing barcode to '{filePath}'");
 
-            using var bitmap = writer.Write("https://omnitech-inc.com/");
+            using var bitmap = writer.Write(content);
             bitmap.Save(filePath, ImageFormat.Png);
+
+            return filePath;
+        }
+
+        static string ReadBarcode(string filePath)
+        {
+            var content = string.Empty;
+
+            var reader = new BarcodeReader
+            {
+                //Options = new DecodingOptions
+                //{
+                //    PossibleFormats = new List<BarcodeFormat> { BarcodeFormat.QR_CODE }
+                //}
+            };
+
+            using var barcodeBitmap = Image.FromFile(filePath) as Bitmap;
+            var result = reader.Decode(barcodeBitmap);
+            
+            Console.WriteLine("\nBarcode Read Result");
+            Console.WriteLine($"Format: {result.BarcodeFormat}");
+            Console.WriteLine($"Text  : {result.Text}");
+
+            return result.Text;
         }
     }
 }
